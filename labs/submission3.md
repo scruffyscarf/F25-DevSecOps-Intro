@@ -33,3 +33,5 @@ ssh -T git@github.com
 - **Supports Security Policies**: Enforces organizational rules for secure collaboration.  
 
 ## 4. Screenshots of the "Verified" badge on GitHub
+
+-
