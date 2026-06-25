@@ -1,578 +1,341 @@
-# 🔐 Introduction to DevSecOps: Principles, Practices & Secure Delivery
+# DevSecOps Intro — Security as Code, From SDLC to Runtime
 
-[![Labs](https://img.shields.io/badge/Labs-80%25-blue)](#-lab-based-learning-experience)
-[![Exam](https://img.shields.io/badge/Exam-20%25-orange)](#-evaluation-framework)
-[![Hands-On](https://img.shields.io/badge/Focus-Hands--On%20Security-success)](#-lab-based-learning-experience)
-[![Duration](https://img.shields.io/badge/Duration-10%20Modules-lightgrey)](#-course-roadmap)
+![labs](https://img.shields.io/badge/Main_Labs-70%25-blue)
+![bonus](https://img.shields.io/badge/Bonuses_+_Bonus_Labs-34%25-yellow)
+![exam](https://img.shields.io/badge/Exam-30%25-green)
+![focus](https://img.shields.io/badge/Focus-Hands--On-orange)
+![duration](https://img.shields.io/badge/Duration-10%20Weeks-informational)
 
-Welcome to the **Introduction to DevSecOps Course**, where you will learn to **integrate security seamlessly into modern software development and operations**.  
-This course is designed to provide a comprehensive understanding of DevSecOps culture, practices, and tooling for building secure software systems.  
-Through **hands-on labs and focused lectures**, you'll gain experience with secure coding, automated testing, infrastructure-as-code security, container hardening, and vulnerability management — the same approaches used by leading engineering teams worldwide.
+A hands-on elective course that teaches how to build a working DevSecOps program. You operate the same target — **OWASP Juice Shop** — across 10 weeks, applying a different defensive practice each lab: pre-commit secrets, signed commits, SBOM, SAST, DAST, IaC scanning, container hardening, supply-chain signing, runtime detection, and full-program triage in DefectDojo.
 
----
-
-## 📚 Course Roadmap
-
-**10-module intensive course** with practical labs designed for incremental skill development:
-
-| Lab | Module                                      | Key Topics & Technologies                                                                 |
-|-----|---------------------------------------------|------------------------------------------------------------------------------------------|
-| 1   | **Foundations & Secure SDLC**               | DevSecOps principles, shift-left culture, OWASP Top 10, secure coding practices           |
-| 2   | **Threat Modeling & Security Requirements** | STRIDE analysis, attack surfaces, risk assessment, agile security integration             |
-| 3   | **Secure Git & Secrets Management**         | Git security, signed commits, secret scanning, vault integration, secure workflows        |
-| 4   | **CI/CD Security & Build Hardening**        | Secure pipelines, artifact integrity, quality gates, SBOM generation, SCA integration     |
-| 5   | **Application Security Testing**            | SAST, DAST, IAST, security tool integration, automated testing pipelines                  |
-| 6   | **Infrastructure-as-Code Security**         | Terraform/Pulumi/Ansible scanning, misconfiguration detection, policy-as-code            |
-| 7   | **Container & Kubernetes Security**         | Docker/K8s fundamentals, image scanning, RBAC, PodSecurity, runtime protection           |
-| 8   | **Software Supply Chain Security**          | Dependency analysis, SBOM (CycloneDX/SPDX), artifact signing, provenance verification    |
-| 9   | **Monitoring, Compliance & Improvement**    | Security metrics, KPIs (MTTR, vuln age), GDPR/NIST/ISO basics, maturity models          |
-| 10  | **Vulnerability Management & Response**     | Discovery, triage, remediation workflows, CVSS scoring, security testing orchestration    |
+> *"Security is not a product, but a process."* — Bruce Schneier, *Secrets and Lies* (2000)
 
 ---
 
-## 🗺️ DevSecOps Learning Journey
+## Course Roadmap
 
-<details>
-<summary>🌳 View Skill Tree Structure</summary>
+The course follows a **map → discover → write → ship → scan → harden → sign → detect → triage** progression. Each week adds one defensive layer to the same Juice Shop target.
+
+| Week | Lab | Module | Key Topics & Technologies |
+|------|-----|--------|---------------------------|
+| 1 | Lab 1 | Foundations & SDLC | OWASP Top 10:2025, Juice Shop deploy, PR workflow |
+| 2 | Lab 2 | Threat Modeling | STRIDE, DFDs, trust boundaries, Threagile YAML |
+| 3 | Lab 3 | Secure Git | SSH commit signing, pre-commit gitleaks, history rewrite with `git filter-repo` |
+| 4 | Lab 4 | SBOM + SCA | Syft (CycloneDX 1.6 + SPDX), Grype, Trivy, sign-ready attestations |
+| 5 | Lab 5 | SAST + DAST | Semgrep (`p/owasp-top-ten`), ZAP baseline + authenticated, cross-tool correlation |
+| 6 | Lab 6 | IaC Security | Checkov 3.x on Terraform, KICS on Ansible + Pulumi, custom Checkov policies |
+| 7 | Lab 7 | Container/K8s | Trivy image scan, Pod Security Standards (`restricted`), securityContext, NetworkPolicy, Conftest gate |
+| 8 | Lab 8 | Supply Chain | Cosign v3 sign + verify + tamper demo, SBOM/SLSA attestations, `cosign sign-blob` |
+| 9 | Lab 9 | Runtime + PaC | Falco (modern eBPF), custom rules, Conftest/Rego policies at CI time |
+| 10 | Lab 10 | Vulnerability Management | DefectDojo capstone — import all prior labs, dedup, SLA matrix, MTTR/age, 5-min walkthrough |
+| — | Lab 11 | Edge Hardening *(bonus)* | Nginx TLS 1.3, security headers, rate limiting, cert rotation; bonus: Coraza WAF + OWASP CRS |
+| — | Lab 12 | VM Sandboxing *(bonus)* | Kata Containers, runc-vs-VM isolation, perf benchmark; bonus: real container-escape PoC blocked by Kata |
+
+---
+
+## The Project: OWASP Juice Shop
+
+A deliberately-vulnerable web application maintained by Björn Kimminich since 2014; OWASP Flagship since 2018. The course pins **v20.0.0** (May 2026 release — Node 24, ~125 MB image, includes AI-themed prompt-injection challenges).
 
 ```mermaid
-graph TB
-    ROOT[🔐 DevSecOps Mastery] 
-    
-    %% Foundation Branch
-    ROOT --- FOUND[🏗️ Foundation]
-    FOUND --- A[📚 Lab 1: DevSecOps Intro<br/>• Secure SDLC<br/>• Shift-Left Culture<br/>• OWASP Top 10]
-    FOUND --- B[🎯 Lab 2: Threat Modeling<br/>• STRIDE Analysis<br/>• Attack Surfaces<br/>• Risk Assessment]
-    
-    %% Development Branch  
-    ROOT --- DEV[👨‍💻 Development]
-    DEV --- C[🔐 Lab 3: Secure Git<br/>• Signed Commits<br/>• Secrets Management<br/>• Secure Workflows]
-    DEV --- D[🚀 Lab 4: CI/CD Security<br/>• Secure Pipelines<br/>• Build Hardening<br/>• Quality Gates]
-    
-    %% Testing Branch
-    ROOT --- TEST[🧪 Testing]
-    TEST --- E[🔍 Lab 5: AppSec Testing<br/>• SAST/DAST/SCA<br/>• Tool Integration<br/>• Automated Security]
-    TEST --- J[🎯 Lab 10: Vuln Management<br/>• Discovery & Triage<br/>• CVSS Scoring<br/>• Remediation Workflows]
-    
-    %% Infrastructure Branch
-    ROOT --- INFRA[🏗️ Infrastructure]
-    INFRA --- F[⚙️ Lab 6: IaC Security<br/>• Terraform/Ansible<br/>• Config Scanning<br/>• Policy as Code]
-    INFRA --- G[📦 Lab 7: Container Security<br/>• Docker/K8s Security<br/>• Image Scanning<br/>• Runtime Protection]
-    
-    %% Supply Chain Branch
-    ROOT --- SUPPLY[🔗 Supply Chain]
-    SUPPLY --- H[📋 Lab 8: SBOM & Provenance<br/>• Dependency Analysis<br/>• Artifact Signing<br/>• Supply Chain Security]
-    
-    %% Operations Branch
-    ROOT --- OPS[📊 Operations]
-    OPS --- I[📈 Lab 9: Monitoring & Compliance<br/>• Security Metrics<br/>• GDPR/NIST/ISO<br/>• Maturity Models]
-    
-    %% Styling
-    classDef rootStyle fill:#1a1a1a,stroke:#ffffff,stroke-width:3px,color:#ffffff
-    classDef branchStyle fill:#2c3e50,stroke:#e74c3c,stroke-width:2px,color:#ffffff
-    classDef foundationModule fill:#fdf2e9,stroke:#e67e22,stroke-width:2px,color:#2c3e50
-    classDef devModule fill:#eaf2f8,stroke:#3498db,stroke-width:2px,color:#2c3e50
-    classDef testModule fill:#f4ecf7,stroke:#9b59b6,stroke-width:2px,color:#2c3e50
-    classDef infraModule fill:#e8f8f5,stroke:#16a085,stroke-width:2px,color:#2c3e50
-    classDef supplyModule fill:#fdedec,stroke:#e74c3c,stroke-width:2px,color:#2c3e50
-    classDef opsModule fill:#fff3cd,stroke:#f1c40f,stroke-width:2px,color:#2c3e50
-    
-    class ROOT rootStyle
-    class FOUND,DEV,TEST,INFRA,SUPPLY,OPS branchStyle
-    class A,B foundationModule
-    class C,D devModule
-    class E,J testModule
-    class F,G infraModule
-    class H supplyModule
-    class I opsModule
+graph LR
+    L1["📂 Lab 1<br/>Deploy + Triage"] --> J[(OWASP Juice Shop<br/>v20.0.0)]
+    L3["🔐 Lab 3<br/>Signed commits"] --> J
+    L4["📋 Lab 4<br/>SBOM (3069 components)"] --> J
+    L5["🧪 Lab 5<br/>SAST + DAST"] --> J
+    L7["📦 Lab 7<br/>Container scan + harden"] --> J
+    L8["🔏 Lab 8<br/>Cosign sign"] --> J
+    L9["🐝 Lab 9<br/>Falco runtime"] --> J
+    L10["🎯 Lab 10<br/>DefectDojo triage"] --> J
+
+    style J fill:#FF9800,color:#fff
 ```
 
-</details>
-
-<details>
-<summary>🏗️ View Security Integration Layers</summary>
-
-```mermaid
-flowchart LR
-    subgraph "🔗 Supply Chain & Operations"
-        direction LR
-        H[📋 Lab 8: SBOM & Provenance<br/>Dependency Security]
-        I[📈 Lab 9: Monitoring<br/>Security Metrics]
-    end
-    
-    subgraph "🏗️ Infrastructure Security"
-        direction LR
-        F[⚙️ Lab 6: IaC Security<br/>Config Management]
-        G[📦 Lab 7: Container Security<br/>Runtime Protection]
-    end
-    
-    subgraph "🧪 Security Testing"
-        direction LR
-        E[🔍 Lab 5: AppSec Testing<br/>SAST/DAST/SCA]
-        J[🎯 Lab 10: Vuln Management<br/>Remediation Workflows]
-    end
-    
-    subgraph "👨‍💻 Secure Development"
-        direction LR
-        C[🔐 Lab 3: Secure Git<br/>Secrets & Signing]
-        D[🚀 Lab 4: CI/CD Security<br/>Pipeline Hardening]
-    end
-    
-    subgraph "🏗️ Foundation Layer"
-        direction LR
-        A[📚 Lab 1: DevSecOps<br/>Principles & SDLC]
-        B[🎯 Lab 2: Threat Modeling<br/>Risk Analysis]
-    end
-    
-    A --> C
-    B --> C
-    C --> E
-    D --> E
-    D --> F
-    E --> F
-    F --> G
-    G --> H
-    H --> I
-    E --> J
-    J --> I
-    
-    classDef foundation fill:#fdf2e9,stroke:#e67e22,stroke-width:3px,color:#2c3e50
-    classDef development fill:#eaf2f8,stroke:#3498db,stroke-width:3px,color:#2c3e50
-    classDef testing fill:#f4ecf7,stroke:#9b59b6,stroke-width:3px,color:#2c3e50
-    classDef infrastructure fill:#e8f8f5,stroke:#16a085,stroke-width:3px,color:#2c3e50
-    classDef operations fill:#fdedec,stroke:#e74c3c,stroke-width:3px,color:#2c3e50
-    
-    class A,B foundation
-    class C,D development
-    class E,J testing
-    class F,G infrastructure
-    class H,I operations
-```
-
-</details>
+**You don't build the app; you make it secure.** Labs 2 (Threat Modeling), 6 (IaC), 11 (reverse proxy), and 12 (VM sandboxing) operate on adjacent scopes — playgrounds, model files, and infra — but Juice Shop is the thread connecting the others.
 
 ---
 
-## 🛠 Lab-Based Learning Experience
+## Lectures + Readings
 
-**80% of your grade comes from 10 hands-on labs** — each designed to build real-world security skills.
+10 lectures, 17-25 slides each, 350-450 lines. Two readings replace lectures for the bonus labs.
 
-### Lab Structure
+| # | Title | File |
+|--:|-------|------|
+| 1 | DevSecOps Foundations: From "Add Security Later" to "Security Everywhere" | [lec1.md](lectures/lec1.md) |
+| 2 | Threat Modeling: STRIDE, DFDs, and Threagile | [lec2.md](lectures/lec2.md) |
+| 3 | Secure Git: Signed Commits, Secret Scanning, and History Hygiene | [lec3.md](lectures/lec3.md) |
+| 4 | CI/CD Security: Treating the Pipeline as an Attackable System | [lec4.md](lectures/lec4.md) |
+| 5 | SAST + DAST: Reading the Code, Then Watching It Run | [lec5.md](lectures/lec5.md) |
+| 6 | IaC Security: Scanning Your Cloud Before It Burns | [lec6.md](lectures/lec6.md) |
+| 7 | Container & Kubernetes Security: Scanning the Artifact, Hardening the Cluster | [lec7.md](lectures/lec7.md) |
+| 8 | Supply Chain Security: Signing, Attestation, and the xz Backdoor | [lec8.md](lectures/lec8.md) |
+| 9 | Monitoring, Compliance & Maturity: From Findings to a Program | [lec9.md](lectures/lec9.md) |
+| 10 | Vulnerability Management: From 1 000 Findings to a Working Program | [lec10.md](lectures/lec10.md) |
+| R11 | Reading — Web Edge Hardening | [reading11.md](lectures/reading11.md) |
+| R12 | Reading — VM-Backed Containers + Confidential Computing | [reading12.md](lectures/reading12.md) |
 
-* **Task-oriented security challenges** with clear objectives and deliverables
-* **Safe environments** using containers, local VMs, or cloud platforms
-* **Real-world workflows** mirroring professional DevSecOps practices
-* **Progressive difficulty** building on previous security concepts
-* **Industry-standard tools** used in production environments
+---
 
-### Lab Overview
+## Technology Stack
 
-<details>
-<summary>📋 View All Lab Topics</summary>
+All tools free and open-source (or have a meaningful free tier). Versions pinned to April-May 2026.
 
-**Labs 1-10:**
+| Category | Tool | Version | Introduced |
+|----------|------|---------|------------|
+| Target app | OWASP Juice Shop | v20.0.0 | Week 1 (provided) |
+| Containers | Docker / Docker Compose | 28.x | Week 1 |
+| Threat modeling | Threagile | 0.9.1 | Week 2 |
+| Pre-commit framework | pre-commit | latest | Week 3 |
+| Secret scanning | gitleaks | 8.21.x | Week 3 |
+| History rewrite | git-filter-repo | 2.45+ | Week 3 |
+| SBOM | Syft | 1.41.x | Week 4 |
+| SCA | Grype | 0.107.x | Week 4 |
+| Multi-purpose scanner | Trivy | 0.69.x | Week 4, 6, 7 |
+| SAST | Semgrep CE | 1.157.x | Week 5 |
+| DAST | OWASP ZAP | stable (Checkmarx-maintained) | Week 5 |
+| IaC scanning (Terraform) | Checkov | 3.2.x | Week 6 |
+| IaC scanning (Ansible/Pulumi) | KICS | latest | Week 6 |
+| Kubernetes | k3d (k3s in Docker) | v5.8.3 / k3s v1.31.x | Week 7 |
+| Policy-as-Code | Conftest + OPA Rego | 0.68.x / 1.15.x | Week 7, 9 |
+| Supply chain | Cosign | v3.0.x | Week 8 |
+| Local registry | Distribution | v3 | Week 8 |
+| Runtime detection | Falco | 0.43.x | Week 9 |
+| Vulnerability mgmt | DefectDojo | v2.58.x | Week 10 |
+| Bonus: Edge | Nginx | stable-alpine | Lab 11 |
+| Bonus: VM sandbox | Kata Containers | v3.x | Lab 12 |
 
-1. **Foundations & Secure SDLC** — DevSecOps principles, OWASP Top 10, shift-left security
-2. **Threat Modeling** — STRIDE analysis, attack surface mapping, risk assessment
-3. **Secure Git** — Signed commits, secret scanning, secure collaboration workflows
-4. **CI/CD Security** — Pipeline hardening, artifact integrity, quality gates, SBOM
-5. **AppSec Testing** — SAST/DAST/SCA integration, automated security testing
-6. **IaC Security** — Terraform/Pulumi/Ansible scanning, policy-as-code enforcement
-7. **Container Security** — Docker/Kubernetes hardening, image scanning, runtime protection
-8. **Supply Chain** — SBOM generation, dependency analysis, artifact signing
-9. **Monitoring & Compliance** — Security metrics, GDPR/NIST/ISO basics, maturity assessment
-10. **Vulnerability Management** — Discovery, triage, remediation, CVSS scoring
+---
 
-</details>
+## What Ships vs What Students Produce
+
+The course repo ships **only** lab specs, lecture notes, and plumbing files. Students produce all their artifacts in their fork.
+
+| Path | Ships in repo | Students produce |
+|------|:-------------:|:----------------:|
+| `lectures/` | ✅ | |
+| `labs/labN.md` | ✅ | |
+| `labs/lab2/threagile-model.yaml` — Threagile baseline | ✅ | |
+| `labs/lab5/scripts/` — ZAP auth config + helper scripts | ✅ | |
+| `labs/lab6/vulnerable-iac/` — TF/Pulumi/Ansible samples | ✅ | |
+| `labs/lab9/manifests/`, `labs/lab9/policies/` — K8s + Rego starters | ✅ | |
+| `labs/lab10/imports/` — DefectDojo importer | ✅ | |
+| `labs/lab11/docker-compose.yml`, `labs/lab11/reverse-proxy/nginx.conf` | ✅ | |
+| `labs/lab12/scripts/` — Kata install/configure | ✅ | |
+| `.github/PULL_REQUEST_TEMPLATE.md` — students write in Lab 1 | | ✅ |
+| `.github/workflows/*.yml` — students add from Lab 1 bonus onward | | ✅ |
+| `.pre-commit-config.yaml` — students write in Lab 3 | | ✅ |
+| `labs/lab4/juice-shop.cdx.json` — SBOM regenerated each run | | ✅ (gitignored) |
+| `labs/lab6/policies/my-custom-policy.yaml` — Lab 6 bonus | | ✅ |
+| `labs/lab7/k8s/*.yaml` — hardened deployment | | ✅ |
+| `labs/lab8/keys/cosign.pub` — public key (private gitignored) | | ✅ |
+| `labs/lab9/falco/rules/custom-rules.yaml` | | ✅ |
+| `submissions/labN.md` — lab reports, one per week | | ✅ |
+
+The [`.gitignore`](.gitignore) keeps student-produced artifacts (`submissions/`, `.github/workflows/`, generated SBOMs, private keys, scan outputs) out of the course repo. Instructor-only reference submissions live in `refs/` and are also gitignored.
+
+---
+
+## Lab Structure
+
+Each main lab (Labs 1-10) caps at **12 pts = 10 main + 2 bonus**.
+
+| Task | Points | Description |
+|------|-------:|-------------|
+| **Task 1** | 6 pts | Core practice — advances the project; future labs depend on it. Required. |
+| **Task 2** | 4 pts (3 in Lab 1) | Deeper dive into the week's topic. Skippable; project still works without it. |
+| **Task 3** | 1 pt | *Lab 1 only* — GitHub community engagement. |
+| **Bonus Task** | 2 pts | Extension for motivated students (flat 2 pts, not difficulty-weighted). |
+
+A student who only completes Task 1 across all 10 labs ends with a working DevSecOps pipeline — just not all the deeper-dive controls.
+
+**Bonus labs (11 + 12)** have a tighter shape: **Task 1 (4 pts) + Task 2 (4 pts) + Bonus Task (2 pts) = 10 pts total** (vs main labs' 12). The labs are bonus-track in the sense that they're not on the critical path; the Bonus Task inside each lab is still the genuinely-challenging extension. Bonus labs count toward a separate 20% weight (see grading below).
 
 ### Submission Workflow
 
 ```mermaid
 graph LR
-    A[Fork Repo] --> B[Create Branch]
-    B --> C[Complete Tasks]
-    C --> D[Push to Fork]
-    D --> E[Open PR to Course Repo]
-    E --> F[Submit PR Link via Moodle]
-    F --> G[Receive Feedback]
-    
-    style A fill:#e8f8f5,stroke:#16a085,color:#2c3e50
-    style B fill:#e8f8f5,stroke:#16a085,color:#2c3e50
-    style C fill:#fef9e7,stroke:#f39c12,color:#2c3e50
-    style D fill:#eaf2f8,stroke:#3498db,color:#2c3e50
-    style E fill:#f4ecf7,stroke:#9b59b6,color:#2c3e50
-    style F fill:#fdedec,stroke:#e74c3c,color:#2c3e50
-    style G fill:#e8f6f3,stroke:#1abc9c,color:#2c3e50
+    A["Fork Repo"] --> B["Create Branch<br/>feature/labN"]
+    B --> C["Complete Tasks"]
+    C --> D["Write<br/>submissions/labN.md"]
+    D --> E["Push & Open PR"]
+    E --> F["Submit PR URL<br/>via Moodle"]
+    F --> G["Receive Feedback"]
+
+    style A fill:#4CAF50,color:#fff
+    style E fill:#F44336,color:#fff
+    style F fill:#00BCD4,color:#fff
 ```
 
+Submissions are **CLI output + brief analysis**, not source code. Paste the commands you ran and what they printed; answer the questions at the end of each task in 2-3 sentences.
+
+---
+
+## Grading
+
+Five components. Their max contributions sum to **139%** but the grade is **capped at 100%** — multiple paths to A; no single mandatory path.
+
+| Component | Raw Points | Weight | What it rewards |
+|-----------|-----------:|-------:|-----------------|
+| **Main labs 1-10** (Task 1 + Task 2 + Task 3 where applicable) | 100 | **70%** | Diligent project work — the floor for any serious student |
+| **Bonus tasks 1-10** (2 pts each, flat — no difficulty weighting) | 20 | **14%** | Going above and beyond on weekly topics |
+| **Quiz leaderboards** (5 rolling per-2-labs leaderboards, top-10 share 1% pool each) | — | **up to 5%** | Engagement + excellence; rewards late-joining students too |
+| **Bonus labs 11 + 12** (Task 1 + Task 2 + Bonus = 10 pts each) | 20 | **20%** | Edge hardening + VM-backed isolation |
+| **Final exam** | — | **30%** | Optional path — written, comprehensive |
+| **Sum (capped at 100%)** | | **139%** | |
+
+### Paths to A
+
+Two real paths to A (≥90%):
+
+- **Practice path:** all main labs + bonuses + both bonus labs → ≥90%. No exam required.
+- **Exam path:** all main labs + bonuses + decent exam → ≥90%. No bonus labs required.
+
+Sample scores:
+
+| Profile | Main | Bonuses | Bonus labs | Exam | Quiz | Total |
+|---------|-----:|--------:|-----------:|-----:|-----:|------:|
+| All Task 1 only | 42% | 0% | 0% | 0% | 0% | **42%** |
+| All Task 1+2, no bonuses | 70% | 0% | 0% | 0% | 0% | **70%** |
+| Add all weekly bonuses | 70% | 14% | 0% | 0% | 0% | **84%** |
+| + good quiz | 70% | 14% | 0% | 0% | 5% | **89%** ← *just short of A* |
+| + finish one bonus lab | 70% | 14% | 10% | 0% | 5% | **99%** ← *A territory* |
+| + both bonus labs | 70% | 14% | 20% | 0% | 5% | **100%** (capped) |
+| Take the exam instead | 70% | 14% | 0% | 25% | 5% | **100%** (capped) |
+
+**The deliberate design:** `Main + lab-bonuses + quiz` alone tops out at **89% → just short of A**. To earn A you must do at least one bonus lab OR the exam. Stops "easy A from quiz padding."
+
+### Quiz leaderboards (the 5%)
+
+Five rolling windows, one per pair of labs:
+
+| Window | Labs covered |
+|--------|--------------|
+| 1 | labs 1-2 |
+| 2 | labs 3-4 |
+| 3 | labs 5-6 |
+| 4 | labs 7-8 |
+| 5 | labs 9-10 |
+
+Each window allocates a **1% pool** to its top 10 students. Late-joiners can still rank in later windows without being structurally disadvantaged.
+
+### Performance tiers
+
+| Grade | Range | Required to reach |
+|-------|-------|-------------------|
+| **A** | 90-100 | All main labs + at least one of: bonus labs / exam |
+| **B** | 75-89 | Main labs + most bonuses, no extension work |
+| **C** | 60-74 | Main lab Task 1 across most labs |
+| **D** | 0-59 | Below expectations |
+
+### Late submissions
+
+Max 6/12 per lab if submitted within 1 week of deadline. No credit after 1 week.
+
+---
+
+## Required Software
+
 <details>
-<summary>📋 Detailed Submission Process</summary>
+<summary>Core (all weeks)</summary>
 
-**Step-by-Step Guide:**
-
-1. **Fork the course repository** to your GitHub account
-
-2. **Clone your fork locally:**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
-   cd REPO_NAME
-   ```
-
-3. **Create and work on your lab branch:**
-   ```bash
-   git switch -c feature/labX
-   # Complete lab tasks, create submission files
-   git add labs/submissionX.md
-   git commit -m "docs: add labX submission"
-   git push -u origin feature/labX
-   ```
-
-4. **Open PR from your fork → course repository main branch**
-   - Navigate to the course repository on GitHub
-   - Click "New Pull Request"
-   - Select: `base: course-repo/main` ← `compare: your-fork/feature/labX`
-   - Fill in the PR template with task completion checklist
-
-5. **Copy the PR URL and submit via Moodle before deadline**
-
-**⚠️ Important:** PRs must target the **course repository's main branch**, not your fork's main branch.
+- Git ≥ 2.34, Docker ≥ 26, Docker Compose
+- A terminal (bash/zsh)
+- Text editor with Markdown support
+- `curl`, `jq`
 
 </details>
 
-### Grading Policy
-
 <details>
-<summary>🎯 Lab Grading Breakdown</summary>
+<summary>Per-week additions</summary>
 
-**Each lab (1-10) is worth 10 points:**
-
-* **Perfect Submissions (10/10):**
-  - All tasks completed with thorough security analysis
-  - Clear documentation and understanding demonstrated
-  - Security tools configured and used correctly
-  - Submitted on time
-  - **Benefit:** Counts toward exam exemption
-
-* **Strong Submissions (8-9/10):**
-  - All tasks completed with minor issues
-  - Good security analysis and documentation
-  - Minor improvements needed
-
-* **Passing Submissions (6-7/10):**
-  - Core security tasks completed
-  - Basic documentation present
-  - Some areas need improvement
-
-* **Below Passing (<6/10):**
-  - Incomplete security analysis
-  - Insufficient documentation
-  - Major gaps in understanding
-
-**Late Submissions:**
-- Maximum score: 6/10
-- Accepted within 1 week after deadline
-- No credit after 1 week
-
-</details>
-
-<details>
-<summary>🏆 Exam Exemption Policy</summary>
-
-**Qualify for Exam Exemption by:**
-
-1. Submitting **all 10 labs on time**
-2. Scoring **10/10 on at least 8 labs**
-3. Minimum average of **9.0/10 across all labs**
-
-**If qualified:**
-- Skip the final exam
-- Receive bonus points toward final grade
-- Guaranteed **A** grade (90-100)
-
-**Benefits:**
-- Focus on hands-on security learning over memorization
-- Reward consistent, high-quality work
-- Reduce exam stress for top performers
+| Week | Add |
+|------|-----|
+| 3 | `gitleaks` (v8.21+), Python 3.10+ with `pre-commit` + `git-filter-repo` |
+| 4 | `syft`, `grype`, `trivy` |
+| 5 | `semgrep` (`pip install`), ~3 GB free disk for Juice Shop source clone |
+| 6 | `checkov` (`pip install --break-system-packages` if PEP-668), Docker for KICS |
+| 7 | `k3d` v5.8+, `kubectl` v1.33+, `conftest` v0.68+ |
+| 8 | `cosign` v3.x, optional: GitHub account for OIDC keyless signing |
+| 9 | Linux kernel ≥ 5.8 (for modern eBPF); Falco runs in Docker but needs the host kernel |
+| 10 | ~4 GB RAM headroom for DefectDojo |
+| 11 *(bonus)* | `openssl`, `testssl.sh` (optional) |
+| 12 *(bonus)* | Linux host with KVM (`/dev/kvm`), containerd. **Not** WSL2 by default (unless KVM enabled). |
 
 </details>
 
 ---
 
-## 📊 Evaluation Framework
+## Repository Structure
 
-### Grade Composition
-
-| Component      | Weight | Details                                |
-|----------------|--------|----------------------------------------|
-| **Labs (1-10)**| 80%    | 10 labs × 8 points each                |
-| **Final Exam** | 20%    | Comprehensive assessment (optional if exempt) |
-| **Total**      | 100%   | Exam exemption available for top performers |
-
-### Performance Tiers
-
-<details>
-<summary>📈 Grading Scale</summary>
-
-| Grade | Range   | Description                                                                 |
-|-------|---------|-----------------------------------------------------------------------------|
-| **A** | 90-100  | Mastery of security concepts, innovative solutions, exceptional analysis    |
-| **B** | 75-89   | Consistent completion, solid security understanding, minor improvements     |
-| **C** | 60-74   | Basic security competency demonstrated, needs reinforcement                 |
-| **D** | 0-59    | Fundamental security gaps, re-attempt required                              |
-
-**Grade Calculation Example:**
 ```
-Labs: 8 points × 10 labs = 80 points (80%)
-Exam: 20 points (20%)
-Total: 100 points
-
-Student Example:
-- Labs: 75/80 (93.75%)
-- Exam: 17/20 (85%)
-- Final: 92/100 = A
+DevSecOps-Intro/
+├── README.md                      # This file
+├── .gitignore                     # Keeps student artifacts + refs/ out
+│
+├── lectures/                      # 10 lectures + 2 readings (ships)
+│   ├── lec1.md ... lec10.md
+│   └── reading11.md, reading12.md
+│
+├── labs/                          # Lab specs + plumbing (ships)
+│   ├── lab1.md ... lab12.md
+│   ├── lab2/threagile-model.yaml          # Threat model baseline
+│   ├── lab5/scripts/                       # ZAP auth config + helpers
+│   ├── lab6/vulnerable-iac/                # TF/Pulumi/Ansible samples
+│   ├── lab9/manifests/, lab9/policies/    # K8s + Rego starters
+│   ├── lab10/imports/                      # DefectDojo importer
+│   ├── lab11/docker-compose.yml, lab11/reverse-proxy/   # Nginx stack
+│   └── lab12/scripts/, lab12/setup/        # Kata install
+│
+├── refs/                          # Instructor reference submissions (gitignored)
+│   └── labN.md                    #   model answers per lab, captured from dry-runs
+│
+└── submissions/                   # (students write one report per lab, in their fork)
 ```
 
-</details>
-
 ---
 
-## ✅ Success Path
+## Key Books & Resources
 
-> **"Complete all 10 labs with ≥6/10 to pass. Perfect lab submissions grant exam exemption. Consistent excellence leads to an A grade."**
+| 📖 Book | Author(s) | Why |
+|---------|-----------|-----|
+| **Threat Modeling: A Practical Guide for Development Teams** | Tarandach & Coles (O'Reilly, 2021) | Best modern primer; pairs with Threagile |
+| **Web Application Security** | Andrew Hoffman (O'Reilly, 2020) | Companion to Juice Shop; explains what DAST is testing for |
+| **Container Security** | Liz Rice (O'Reilly, 2020) | Ch. 11 on runtime security is the strongest book chapter on Falco's terrain |
+| **Software Supply Chain Security** | Cassie Crossley (Manning, 2024) | Best single book on the L8 material |
+| **Securing DevOps** | Julien Vehent (Manning, 2018) | Real Mozilla pipeline walkthrough; ch. 9-10 cover the L10 metrics + program loop |
+| **Application Security Program Handbook** | Derek Fisher (Manning, 2023) | Best single book on program metrics + SLAs |
 
 <details>
-<summary>💡 Tips for Success</summary>
+<summary>Standards & specs (bookmark these)</summary>
 
-**Lab Completion Strategy:**
-1. Start each lab early - security analysis takes time
-2. Read instructions thoroughly before beginning
-3. Test all security tools and configurations
-4. Document findings with screenshots and explanations
-5. Review vulnerability reports carefully
-
-**Security-Specific Tips:**
-1. **Understand the "Why"** - Don't just run tools, understand what they detect
-2. **Analyze Results** - Explain security implications, not just tool outputs
-3. **Think Like an Attacker** - Consider how vulnerabilities could be exploited
-4. **Prioritize Findings** - Use CVSS scores and risk assessment
-5. **Remediate Properly** - Provide secure alternatives, not just "fix this"
-
-**Documentation Best Practices:**
-1. Use clear Markdown formatting with security-focused headers
-2. Include both tool outputs AND your security analysis
-3. Explain attack vectors and business impact
-4. Screenshot critical vulnerabilities with annotations
-5. Organize findings by severity (Critical, High, Medium, Low)
-
-**Git Workflow:**
-1. Always work on feature branches for security labs
-2. Use descriptive commit messages (e.g., `security: add SAST scan results`)
-3. Push regularly to avoid losing vulnerability reports
-4. Open PRs to the course repository, not your fork
-5. Review the security checklist before submitting
-
-**Time Management:**
-1. Allocate 4-6 hours per lab (security analysis is thorough)
-2. Break labs into: setup, scanning, analysis, documentation
-3. Use lab deadlines visible in Moodle
-4. Review previous labs before starting new security modules
-5. Don't rush vulnerability analysis - accuracy matters
-
-**Getting Help:**
-1. Review lab guidelines and security tool documentation
-2. Check OWASP and CWE resources for vulnerability context
-3. Discuss security concepts with classmates (collaboration encouraged)
-4. Attend office hours with specific security questions
-5. Submit questions early - security troubleshooting takes time
+- [OWASP Top 10:2025](https://owasp.org/Top10/2025/) — current; built from 175k+ CVE records
+- [OWASP Top 10 CI/CD Security Risks](https://owasp.org/www-project-top-10-ci-cd-security-risks/) — Lecture 4 framework
+- [OWASP SAMM v2.0](https://owaspsamm.org/) — maturity model
+- [SLSA v1.0](https://slsa.dev/spec/v1.0/) — supply-chain framework
+- [NIST CSF 2.0](https://www.nist.gov/cyberframework) — Feb 2024 with new Govern function
+- [Sigstore documentation](https://docs.sigstore.dev/) — Cosign + Fulcio + Rekor
 
 </details>
 
 <details>
-<summary>📅 Recommended Study Schedule</summary>
+<summary>Talks worth your time</summary>
 
-**Per-Lab Pattern:**
-
-**Days 1-2: Setup & Understanding**
-- Attend lecture on security topic
-- Review lab requirements and security objectives
-- Install and configure security tools
-- Read documentation for scanners/analyzers
-
-**Days 3-5: Execution & Scanning**
-- Run security scans and collect results
-- Perform vulnerability assessments
-- Test security controls
-- Capture evidence (screenshots, logs)
-
-**Day 6: Analysis & Documentation**
-- Analyze security findings
-- Prioritize vulnerabilities by severity
-- Research remediation strategies
-- Document security insights
-
-**Day 7: Review & Submit**
-- Proofread security analysis
-- Verify all evidence is included
-- Review checklist for completeness
-- Submit PR via Moodle
-
-**Before Each Lab:**
-1. Review previous security concepts
-2. Ensure security tools are updated
-3. Read entire lab instructions first
-4. Identify prerequisites or installations needed
-
-**After Each Lab:**
-1. Reflect on key security learnings
-2. Note security challenges for future reference
-3. Review instructor feedback when provided
-4. Connect vulnerabilities to real-world incidents
-
-**Exam Preparation (if needed):**
-- Review all lab security findings
-- Revisit key vulnerability types
-- Practice security tool commands
-- Focus on understanding attack vectors, not memorization
+- *"What Happens When Falco Detects?"* — Loris Degioanni, KubeCon EU 2024
+- *"The xz Backdoor — Engineering Postmortem"* — Andres Freund, BSDCan 2024
+- *"OWASP Top 10:2025 — What Changed and Why"* — Andrew van der Stock, Global AppSec 2025
+- *"Sigstore: Software Signing for Everybody"* — Luke Hinds, KubeCon 2022
 
 </details>
 
 ---
 
-## 📚 Additional Resources
+## Course Completion
 
-<details>
-<summary>🔗 Essential Links</summary>
+By Week 10 you'll have:
 
-**Course Materials:**
-- [Moodle Course Page](https://moodle.innopolis.university/) - Lectures, deadlines, grades
-- [Course Repository](https://github.com/your-org/devsecops-course) - Lab assignments and resources
+- A working DevSecOps pipeline operating against OWASP Juice Shop with controls at pre-commit, build, deploy, and runtime
+- A DefectDojo instance with all prior labs' findings deduped + triaged under an SLA matrix
+- A 5-minute interview walkthrough script you can use in DevSecOps job interviews
+- If you did the bonus labs: a production-grade Nginx reverse-proxy config + first-hand experience with VM-backed container sandboxing
 
-**DevSecOps Fundamentals:**
-- [OWASP DevSecOps Guideline](https://owasp.org/www-project-devsecops-guideline/)
-- [NIST Secure Software Development Framework](https://csrc.nist.gov/Projects/ssdf)
-- [The DevSecOps Playbook](https://www.redhat.com/en/resources/devsecops-culture-process-and-tools-ebook)
-
-**Security Standards & Frameworks:**
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [CWE Top 25](https://cwe.mitre.org/top25/)
-- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
-- [CIS Controls](https://www.cisecurity.org/controls)
-
-**Application Security Testing:**
-- [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
-- [SAST vs DAST vs IAST](https://www.synopsys.com/blogs/software-security/sast-vs-dast-difference/)
-- [Security Testing in CI/CD](https://owasp.org/www-project-devsecops-guideline/latest/02a-Integrate-Security-into-Development)
-
-**Infrastructure Security:**
-- [Terraform Security Best Practices](https://www.terraform.io/docs/cloud/guides/recommended-practices/index.html)
-- [Kubernetes Security Best Practices](https://kubernetes.io/docs/concepts/security/)
-- [Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
-
-**Vulnerability Management:**
-- [CVSS Calculator](https://www.first.org/cvss/calculator/3.1)
-- [National Vulnerability Database](https://nvd.nist.gov/)
-- [CVE Details](https://www.cvedetails.com/)
-
-**Supply Chain Security:**
-- [SBOM Standards (SPDX/CycloneDX)](https://www.cisa.gov/sbom)
-- [SLSA Framework](https://slsa.dev/)
-- [Sigstore Documentation](https://docs.sigstore.dev/)
-
-</details>
-
-<details>
-<summary>🛠️ Required Tools & Software</summary>
-
-**Core Tools (Needed for most labs):**
-- Git (version control with security features)
-- Docker (containerization and security scanning)
-- Text editor with Markdown support (VS Code recommended)
-- Web browser (Chrome, Firefox)
-- Terminal/Command line
-
-**Security Tools (Install as needed per lab):**
-- **Lab 1-2:** OWASP ZAP, threat modeling tools
-- **Lab 3:** Git-secrets, Gitleaks, signed commit setup
-- **Lab 4:** GitHub Actions, quality gates, SBOM generators
-- **Lab 5:** SAST tools (Semgrep, Bandit), DAST tools (ZAP)
-- **Lab 6:** Terraform, Checkov, KICS, Terrascan
-- **Lab 7:** Docker, Trivy, Snyk, Kubernetes (kind/minikube)
-- **Lab 8:** Syft, Grype, Cosign
-- **Lab 9:** Prometheus, Grafana, compliance scanners
-- **Lab 10:** Vulnerability management platforms
-
-**Installation Guides:**
-- Most security tools run in Docker containers (minimal setup)
-- Cloud services use free tiers (no payment required)
-- Tool-specific installation instructions provided in each lab
-
-</details>
-
-<details>
-<summary>📖 Learning Resources by Topic</summary>
-
-**Labs 1-2: DevSecOps & Threat Modeling**
-- [DevSecOps Manifesto](https://www.devsecops.org/)
-- [STRIDE Threat Modeling](https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats)
-- [OWASP Threat Modeling](https://owasp.org/www-community/Threat_Modeling)
-
-**Lab 3: Secure Git**
-- [Git Security Best Practices](https://www.git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work)
-- [Secrets Management Guide](https://owasp.org/www-project-devsecops-guideline/latest/02c-Secret-Management)
-- [GitHub Security Features](https://docs.github.com/en/code-security)
-
-**Lab 4: CI/CD Security**
-- [Secure CI/CD Practices](https://www.cisa.gov/sites/default/files/publications/ESF_SECURING_THE_SOFTWARE_SUPPLY_CHAIN_DEVELOPERS.PDF)
-- [GitHub Actions Security](https://docs.github.com/en/actions/security-guides)
-- [SBOM Generation Guide](https://www.cisa.gov/sbom)
-
-**Lab 5: AppSec Testing**
-- [OWASP SAMM](https://owaspsamm.org/)
-- [Static Analysis Tools List](https://owasp.org/www-community/Source_Code_Analysis_Tools)
-- [Dynamic Analysis Guide](https://owasp.org/www-project-web-security-testing-guide/)
-
-**Lab 6: IaC Security**
-- [IaC Security Best Practices](https://owasp.org/www-project-devsecops-guideline/latest/02d-Infrastructure-as-Code-Scanning)
-- [KICS Documentation](https://docs.kics.io/)
-- [Checkov Documentation](https://www.checkov.io/1.Welcome/Quick%20Start.html)
-
-**Lab 7: Container Security**
-- [Docker Security Best Practices](https://docs.docker.com/develop/security-best-practices/)
-- [Kubernetes Security](https://kubernetes.io/docs/concepts/security/overview/)
-- [Container Security Guide](https://www.nist.gov/publications/application-container-security-guide)
-
-**Lab 8: Supply Chain**
-- [SLSA Framework](https://slsa.dev/spec/v1.0/)
-- [SBOM Tool](https://github.com/kubernetes-sigs/bom)
-- [Sigstore Tutorial](https://edu.chainguard.dev/open-source/sigstore/)
-
-**Lab 9: Monitoring & Compliance**
-- [Security Metrics Guide](https://www.sans.org/white-papers/55/)
-- [GDPR for Developers](https://www.smashingmagazine.com/2017/07/privacy-by-design-framework/)
-- [NIST SP 800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
-
-**Lab 10: Vulnerability Management**
-- [Vulnerability Management Lifecycle](https://owasp.org/www-community/Vulnerability_Management_Lifecycle)
-- [CVSS Guide](https://www.first.org/cvss/user-guide)
-- [Remediation Best Practices](https://cheatsheetseries.owasp.org/cheatsheets/Vulnerability_Disclosure_Cheat_Sheet.html)
-
-</details>
-
----
-
-## 🎓 Course Completion
-
-Upon successful completion of this course, you will have:
-
-✅ **Practical DevSecOps Skills** — Hands-on experience with industry-standard security tools  
-✅ **Security Portfolio** — 10 documented security analysis projects showcasing your abilities  
-✅ **Secure SDLC Knowledge** — Understanding of shift-left security and secure development practices  
-✅ **AppSec Testing Experience** — SAST, DAST, and SCA tool integration expertise  
-✅ **IaC Security Mastery** — Configuration scanning and policy-as-code enforcement skills  
-✅ **Container Security** — Docker and Kubernetes hardening and scanning knowledge  
-✅ **Supply Chain Awareness** — SBOM generation and dependency security analysis  
-✅ **Vulnerability Management** — Discovery, triage, and remediation workflow proficiency  
-✅ **Compliance Understanding** — GDPR, NIST, and ISO security framework basics  
-✅ **Threat Modeling Skills** — STRIDE analysis and risk assessment capabilities  
-
----
+**This is exactly the portfolio you'd walk through in a DevSecOps interview** — see the 5-minute walkthrough script in `submissions/lab10-walkthrough.md` (produced in Lab 10 bonus).
